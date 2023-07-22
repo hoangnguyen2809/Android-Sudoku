@@ -1,13 +1,11 @@
 package com.example.dcmsudoku;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +15,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private Button selectedButton;
     private int[][] sudokuBoard;
-    private int[] buttonIds
+    private final int[] buttonIds
             = new int[] {
             R.id.s00, R.id.s01, R.id.s02, R.id.s03, R.id.s04, R.id.s05, R.id.s06, R.id.s07, R.id.s08,
             R.id.s10, R.id.s11, R.id.s12, R.id.s13, R.id.s14, R.id.s15, R.id.s16, R.id.s17, R.id.s18,
@@ -30,7 +28,8 @@ public class MainActivity extends AppCompatActivity {
             R.id.s80, R.id.s81, R.id.s82, R.id.s83, R.id.s84, R.id.s85, R.id.s86, R.id.s87, R.id.s88
     };
 
-
+    private static final String TAG_ORIGINAL = "original";
+    private static final String TAG_USER = "user";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         Button number_7_btn = findViewById(R.id.pad7);
         Button number_8_btn = findViewById(R.id.pad8);
         Button number_9_btn = findViewById(R.id.pad9);
+        Button erase_btn = findViewById(R.id.erase_btn);
+        Button reset_btn = findViewById(R.id.reset_btn);
 
         // Loop through the button IDs array and add the OnClickListener to each button
         for (int buttonId : buttonIds) {
@@ -124,8 +125,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        erase_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedButton != null)
+                {
+                    selectedButton.setText("");
+                }
+            }
+        });
 
-
+        reset_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetUserFilledButtons();
+            }
+        });
     };
 
 
@@ -155,14 +170,11 @@ public class MainActivity extends AppCompatActivity {
     }
     private int extractColumn(int buttonId) {
         String idString = getResources().getResourceEntryName(buttonId);
-        int col = Character.getNumericValue(idString.charAt(2));
-
-        return col;
+        return Character.getNumericValue(idString.charAt(2));
     }
     private int extractRow(int buttonId) {
         String idString = getResources().getResourceEntryName(buttonId); // Get the resource name as a string
-        int row = Character.getNumericValue(idString.charAt(1)); // Extract the second character (row number)
-        return row;
+        return Character.getNumericValue(idString.charAt(1));
     }
     private void restoreRowAndColumnColors(int row, int col) {
         // Restore the background color of buttons in the same row
@@ -214,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void initializeBoard(int[] buttonIds) {
-
         for (int i = 0; i < buttonIds.length; i++) {
             Button button = findViewById(buttonIds[i]);
             int row = i / 9;
@@ -223,6 +234,12 @@ public class MainActivity extends AppCompatActivity {
             button.setEnabled(false);
             button.setTextSize(18);
             button.setTextColor(Color.BLACK);
+
+            if (sudokuBoard[row][col] != 0) {
+                button.setTag(TAG_ORIGINAL);
+            } else {
+                button.setTag(TAG_USER);
+            }
         }
 
         List<Integer> buttonList = new ArrayList<>();
@@ -262,6 +279,17 @@ public class MainActivity extends AppCompatActivity {
         if (selectedButton != null)
         {
             selectedButton.setText(number);
+        }
+        assert selectedButton != null;
+        selectedButton.setTag(TAG_USER);
+    }
+
+    private void resetUserFilledButtons() {
+        for (int buttonId : buttonIds) {
+            Button button = findViewById(buttonId);
+            if (button.getTag() != null && button.getTag().equals(TAG_USER)) {
+                button.setText("");
+            }
         }
     }
 }
