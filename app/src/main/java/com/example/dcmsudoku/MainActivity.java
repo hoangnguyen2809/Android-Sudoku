@@ -3,6 +3,8 @@ package com.example.dcmsudoku;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -29,18 +31,24 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         sudokuBoard = generateDistinctNumbers();
-
         initializeBoard(buttonIds);
 
-
-        // Create an array to store the IDs of the buttons
-
+        Button number_1_btn = findViewById(R.id.pad1);
+        Button number_2_btn = findViewById(R.id.pad2);
+        Button number_3_btn = findViewById(R.id.pad3);
+        Button number_4_btn = findViewById(R.id.pad4);
+        Button number_5_btn = findViewById(R.id.pad5);
+        Button number_6_btn = findViewById(R.id.pad6);
+        Button number_7_btn = findViewById(R.id.pad7);
+        Button number_8_btn = findViewById(R.id.pad8);
+        Button number_9_btn = findViewById(R.id.pad9);
 
         // Loop through the button IDs array and add the OnClickListener to each button
         for (int buttonId : buttonIds) {
@@ -52,7 +60,76 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-    }
+
+        number_1_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeButtonValue("1");
+            }
+        });
+
+        number_2_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeButtonValue("2");
+            }
+        });
+
+        number_3_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeButtonValue("3");
+            }
+        });
+
+        number_4_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeButtonValue("4");
+            }
+        });
+
+        number_5_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeButtonValue("5");
+            }
+        });
+
+        number_6_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeButtonValue("6");
+            }
+        });
+
+        number_7_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeButtonValue("7");
+            }
+        });
+
+        number_8_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeButtonValue("8");
+            }
+        });
+
+        number_9_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeButtonValue("9");
+            }
+        });
+
+
+
+    };
+
+
+
 
     private void selectButton(Button button) {
         // Check if a button is already selected
@@ -67,9 +144,6 @@ public class MainActivity extends AppCompatActivity {
             restoreRowAndColumnColors(selectedRow, selectedCol);
         }
 
-        // Set the background color of the newly selected button
-
-
         // Update the selectedButton reference to the current button
         selectedButton = button;
 
@@ -79,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
         changeRowAndColumnColors(currentRow, currentCol);
         button.setBackgroundResource(R.drawable.selected_cell);
     }
-
     private int extractColumn(int buttonId) {
         String idString = getResources().getResourceEntryName(buttonId);
         int col = Character.getNumericValue(idString.charAt(2));
@@ -91,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
         int row = Character.getNumericValue(idString.charAt(1)); // Extract the second character (row number)
         return row;
     }
-
     private void restoreRowAndColumnColors(int row, int col) {
         // Restore the background color of buttons in the same row
         for (int i = 0; i < 9; i++) {
@@ -107,7 +179,6 @@ public class MainActivity extends AppCompatActivity {
             button.setBackgroundResource(buttonColor);
         }
     }
-
     private void changeRowAndColumnColors(int row, int col) {
         // Change the background color of buttons in the same row
         for (int i = 0; i < 9; i++) {
@@ -121,7 +192,6 @@ public class MainActivity extends AppCompatActivity {
             button.setBackgroundResource(R.drawable.same_row_col_cell);
         }
     }
-
     private int getButtonColor(int buttonId) {
         if (buttonId == R.id.s03 || buttonId == R.id.s04 || buttonId == R.id.s05 ||
                 buttonId == R.id.s13 || buttonId == R.id.s14 || buttonId == R.id.s15 ||
@@ -143,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
             return R.drawable.odd_grid;
         }
     }
-
     private void initializeBoard(int[] buttonIds) {
 
         for (int i = 0; i < buttonIds.length; i++) {
@@ -188,17 +257,11 @@ public class MainActivity extends AppCompatActivity {
         return board;
     }
 
-    private void createSudokuPuzzle() {
-        List<Integer> positions = new ArrayList<>();
-        for (int i = 0; i < 81; i++) {
-            positions.add(i);
-        }
-        Collections.shuffle(positions);
-
-        for (int i = 0; i < 63; i++) {
-            int position = positions.get(i);
-            Button button = findViewById(buttonIds[position]);
-            button.setText(""); // Remove the number from the button
+    private void changeButtonValue(String number)
+    {
+        if (selectedButton != null)
+        {
+            selectedButton.setText(number);
         }
     }
 }
