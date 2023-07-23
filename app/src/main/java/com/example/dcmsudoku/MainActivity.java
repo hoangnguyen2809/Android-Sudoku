@@ -1,7 +1,9 @@
 package com.example.dcmsudoku;
 
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 
@@ -14,6 +16,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private Button selectedButton;
+
     private int[][] sudokuBoard;
     private final int[] buttonIds
             = new int[] {
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         Button number_9_btn = findViewById(R.id.pad9);
         Button erase_btn = findViewById(R.id.erase_btn);
         Button reset_btn = findViewById(R.id.reset_btn);
+        Button hint_btn = findViewById(R.id.hint_btn);
+        Button check_btn = findViewById(R.id.check_btn);
 
         // Loop through the button IDs array and add the OnClickListener to each button
         for (int buttonId : buttonIds) {
@@ -139,6 +144,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 resetUserFilledButtons();
+            }
+        });
+
+        hint_btn.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                showHint();
+            }
+        });
+
+        check_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkNumber();
             }
         });
     };
@@ -234,6 +254,8 @@ public class MainActivity extends AppCompatActivity {
             button.setEnabled(false);
             button.setTextSize(18);
             button.setTextColor(Color.BLACK);
+            Typeface boldTypeface = Typeface.defaultFromStyle(Typeface.BOLD);
+            button.setTypeface(boldTypeface);
 
             if (sudokuBoard[row][col] != 0) {
                 button.setTag(TAG_ORIGINAL);
@@ -252,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
             Button button = findViewById(buttonList.get(i));
             button.setText("");
             button.setEnabled(true);
-            button.setTextSize(18); // Change the font size as desired
+            button.setTextSize(18);
         }
 
     }
@@ -292,6 +314,60 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    public void showHint() {
+        // Check if a button is selected
+        if (selectedButton != null) {
+
+            int row = extractRow(selectedButton.getId());
+            int col = extractColumn(selectedButton.getId());
+
+            int originalNumber = sudokuBoard[row][col];
+
+            selectedButton.setText(String.valueOf(originalNumber));
+            selectedButton.setTextSize(18);
+        }
+    }
+
+    public void checkNumber() {
+        if (selectedButton != null) {
+            int row = extractRow(selectedButton.getId());
+            int col = extractColumn(selectedButton.getId());
+            int originalNumber = sudokuBoard[row][col];
+
+            String buttonText = selectedButton.getText().toString().trim();
+            int numberFilled = buttonText.isEmpty() ? 0 : Integer.parseInt(buttonText);
+
+            // Flag to track if the background color was changed
+            boolean colorChanged = false;
+
+            // If the number filled by the user is wrong or if the cell is empty,
+            // set the color of the cell to wrong_number
+            if (buttonText.isEmpty() || numberFilled != originalNumber) {
+                selectedButton.setBackgroundResource(R.drawable.wrong_number);
+                colorChanged = true;
+            }
+
+            // If the number filled by the user is correct,
+            // set the color of the cell to right_number
+            if (numberFilled == originalNumber) {
+                selectedButton.setBackgroundResource(R.drawable.right_number);
+                colorChanged = true;
+            }
+
+            // Use a Handler to restore the original background color after 1.5 seconds
+            if (colorChanged) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        selectedButton.setBackgroundResource(R.drawable.selected_cell);
+                    }
+                }, 1500);
+            }
+        }
+    }
+
+
 }
 
 
