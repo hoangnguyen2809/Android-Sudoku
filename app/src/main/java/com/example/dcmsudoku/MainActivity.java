@@ -2,6 +2,7 @@ package com.example.dcmsudoku;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -325,45 +326,82 @@ public class MainActivity extends AppCompatActivity {
             int originalNumber = sudokuBoard[row][col];
 
             selectedButton.setText(String.valueOf(originalNumber));
+            selectedButton.setTag(TAG_USER);
             selectedButton.setTextSize(18);
         }
     }
 
+    private boolean isCheckButtonActive = true;
+
     public void checkNumber() {
-        if (selectedButton != null) {
-            int row = extractRow(selectedButton.getId());
-            int col = extractColumn(selectedButton.getId());
-            int originalNumber = sudokuBoard[row][col];
+        // Check if the check button is active
+        if (!isCheckButtonActive) {
+            return;
+        }
 
-            String buttonText = selectedButton.getText().toString().trim();
-            int numberFilled = buttonText.isEmpty() ? 0 : Integer.parseInt(buttonText);
+        // Disable the check button and set the flag to true
+        Button checkButton = findViewById(R.id.check_btn);
+        checkButton.setEnabled(false);
+        isCheckButtonActive = false;
 
-            // Flag to track if the background color was changed
-            boolean colorChanged = false;
-
-            // If the number filled by the user is wrong or if the cell is empty,
-            // set the color of the cell to wrong_number
-            if (buttonText.isEmpty() || numberFilled != originalNumber) {
-                selectedButton.setBackgroundResource(R.drawable.wrong_number);
-                colorChanged = true;
+        // Use a Handler to enable the check button after 1.6 seconds
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkButton.setEnabled(true);
+                isCheckButtonActive = true;
             }
+        }, 1600);
+        for (int buttonId : buttonIds) {
+            Button button = findViewById(buttonId);
 
-            // If the number filled by the user is correct,
-            // set the color of the cell to right_number
-            if (numberFilled == originalNumber) {
-                selectedButton.setBackgroundResource(R.drawable.right_number);
-                colorChanged = true;
-            }
+            // Check if the button is empty or has the TAG_USER
+            if (button.getTag() == TAG_ORIGINAL)
+            {
 
-            // Use a Handler to restore the original background color after 1.5 seconds
-            if (colorChanged) {
+                int buttonColor = getButtonColor(button.getId());
+                button.setBackgroundResource(buttonColor);
+
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        selectedButton.setBackgroundResource(R.drawable.selected_cell);
+                        button.setBackgroundResource(buttonColor);
                     }
                 }, 1500);
             }
+            if (button.getText().toString().trim().isEmpty() || button.getTag() == TAG_USER) {
+                int row = extractRow(buttonId);
+                int col = extractColumn(buttonId);
+                int originalNumber = sudokuBoard[row][col];
+                int buttonColor = getButtonColor(button.getId());
+
+                String buttonText = button.getText().toString().trim();
+                int numberFilled = buttonText.isEmpty() ? 0 : Integer.parseInt(buttonText);
+
+                // Store the original background color
+                Drawable originalBackground = button.getBackground();
+
+                // If the number filled by the user is wrong or if the cell is empty,
+                // set the color of the cell to wrong_number
+                if (buttonText.isEmpty() || numberFilled != originalNumber) {
+                    button.setBackgroundResource(R.drawable.wrong_number);
+                }
+
+                // If the number filled by the user is correct,
+                // set the color of the cell to right_number
+                if (numberFilled == originalNumber) {
+                    button.setBackgroundResource(R.drawable.right_number);
+                }
+
+                // Use a Handler to restore the original background color after 1.5 seconds
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        button.setBackgroundResource(buttonColor);
+                    }
+                }, 1500);
+            }
+
         }
     }
 

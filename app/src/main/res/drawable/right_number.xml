@@ -3,7 +3,7 @@
     <solid android:color="#90EE90" /> <!-- Set the desired background color for the button -->
     <stroke
         android:width="2dp"
-        android:color="#000000"/>
+        android:color="#5F5F5F"/>
     <corners android:radius="0dp" /> <!-- Set the corner radius to 0dp to make the corners sharp -->
 
 </shape>
