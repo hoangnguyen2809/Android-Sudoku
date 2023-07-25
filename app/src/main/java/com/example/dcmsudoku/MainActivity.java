@@ -2,12 +2,12 @@ package com.example.dcmsudoku;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
@@ -302,6 +302,12 @@ public class MainActivity extends AppCompatActivity {
         if (selectedButton != null)
         {
             selectedButton.setText(number);
+            if (allCellsFilled()) {
+                // Check if the user has won the game
+                if (isSudokuBoardFilledCorrectly()) {
+                    showWinMessage();
+                }
+            }
         }
         assert selectedButton != null;
         selectedButton.setTag(TAG_USER);
@@ -328,6 +334,13 @@ public class MainActivity extends AppCompatActivity {
             selectedButton.setText(String.valueOf(originalNumber));
             selectedButton.setTag(TAG_USER);
             selectedButton.setTextSize(18);
+        }
+
+        if (allCellsFilled()) {
+            // Check if the user has won the game
+            if (isSudokuBoardFilledCorrectly()) {
+                showWinMessage();
+            }
         }
     }
 
@@ -378,9 +391,6 @@ public class MainActivity extends AppCompatActivity {
                 String buttonText = button.getText().toString().trim();
                 int numberFilled = buttonText.isEmpty() ? 0 : Integer.parseInt(buttonText);
 
-                // Store the original background color
-                Drawable originalBackground = button.getBackground();
-
                 // If the number filled by the user is wrong or if the cell is empty,
                 // set the color of the cell to wrong_number
                 if (buttonText.isEmpty() || numberFilled != originalNumber) {
@@ -405,7 +415,47 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private Button getButton(int row, int col) {
+        int buttonId = buttonIds[row * 9 + col];
+        return findViewById(buttonId);
+    }
+    private boolean isSudokuBoardFilledCorrectly() {
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                String buttonText = getButton(row, col).getText().toString().trim();
+                if (buttonText.isEmpty()) {
+                    // If any cell is empty, the board is not filled correctly
+                    return false;
+                }
+                int numberFilled = Integer.parseInt(buttonText);
+                int originalNumber = sudokuBoard[row][col];
+                if (numberFilled != originalNumber) {
+                    // If any cell has an incorrect number, the board is not filled correctly
+                    return false;
+                }
+            }
+        }
+        // If all cells are filled correctly, return true
+        return true;
+    }
 
+    private boolean allCellsFilled() {
+        for (int buttonId : buttonIds) {
+            Button button = findViewById(buttonId);
+            if (button.getText().toString().trim().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void showWinMessage() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Congratulations!");
+        builder.setMessage("You have completed the Sudoku puzzle!");
+        builder.setPositiveButton("OK", null);
+        builder.show();
+    }
 }
 
 
