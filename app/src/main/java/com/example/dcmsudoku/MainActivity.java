@@ -1,5 +1,7 @@
 package com.example.dcmsudoku;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG_ORIGINAL = "original";
     private static final String TAG_USER = "user";
+    private long gameStartTime; // Add this variable to store the start time of the game
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         sudokuBoard = generateDistinctNumbers();
         initializeBoard(buttonIds);
+
 
         Button number_1_btn = findViewById(R.id.pad1);
         Button number_2_btn = findViewById(R.id.pad2);
@@ -271,7 +277,8 @@ public class MainActivity extends AppCompatActivity {
         }
         Collections.shuffle(buttonList);
 
-        for (int i = 0; i < 58; i++) {
+        //Change the value of i in the loop for testing
+        for (int i = 0; i < 2; i++) {
             Button button = findViewById(buttonList.get(i));
             button.setText("");
             button.setEnabled(true);
@@ -374,11 +381,15 @@ public class MainActivity extends AppCompatActivity {
 
                 int buttonColor = getButtonColor(button.getId());
                 button.setBackgroundResource(buttonColor);
+                int currentRow = extractRow(selectedButton.getId());
+                int currentCol = extractColumn(selectedButton.getId());
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         button.setBackgroundResource(buttonColor);
+                        changeRowAndColumnColors(currentRow, currentCol);
+                        selectedButton.setBackgroundResource(R.drawable.selected_cell);
                     }
                 }, 1500);
             }
@@ -387,6 +398,9 @@ public class MainActivity extends AppCompatActivity {
                 int col = extractColumn(buttonId);
                 int originalNumber = sudokuBoard[row][col];
                 int buttonColor = getButtonColor(button.getId());
+                int currentRow = extractRow(selectedButton.getId());
+                int currentCol = extractColumn(selectedButton.getId());
+
 
                 String buttonText = button.getText().toString().trim();
                 int numberFilled = buttonText.isEmpty() ? 0 : Integer.parseInt(buttonText);
@@ -408,6 +422,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         button.setBackgroundResource(buttonColor);
+                        changeRowAndColumnColors(currentRow, currentCol);
+                        selectedButton.setBackgroundResource(R.drawable.selected_cell);
                     }
                 }, 1500);
             }
@@ -449,13 +465,33 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    private void startNewGame() {
+        // Finish the current activity to restart the program
+        finish();
+
+        // Start the MainActivity again using an intent
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
     private void showWinMessage() {
+        long gameEndTime = System.currentTimeMillis();
+        long timeTakenInMillis = gameEndTime - gameStartTime;
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Congratulations!");
-        builder.setMessage("You have completed the Sudoku puzzle!");
-        builder.setPositiveButton("OK", null);
+        builder.setMessage("You have completed the Sudoku puzzle in \nWant to start a new game?");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Start a new game when the user clicks "OK"
+                startNewGame();
+            }
+        });
         builder.show();
     }
+
+    // Helper method to format time in minutes and seconds
 }
 
 
