@@ -25,7 +25,8 @@ Sudoku is an Android application that allows users to play the classic Sudoku pu
 
 ## Screenshots
 
-![GIF](./ezgif.com-video-to-gif.gif)
+![GIF](./ss1.gif)
+![GIF](./ss2.gif)
 
 
 ## Getting Started
